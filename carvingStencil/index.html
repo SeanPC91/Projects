@@ -1,0 +1,256 @@
+<!doctype html>
+<html>
+<link href="carving_stencil.css" rel="stylesheet">
+<head>
+  <script src='http://use.edgefonts.net/creepster.js'></script>
+  <script src='http://use.edgefonts.net/nosifer.js'></script>
+  <script src='reimg-master/reimg.js'></script>
+  <title>Pumpkin Carver</title>
+  <center><h1 id="titleStr" name="titleStr0" id="gradHalloween">Welcome to the Pumpkin Carver, <br>where you can carve a mess-free pumpkin to print out a stencil for your real pumpkin!</h1>
+  <h2> </h2>
+  <h3>Developed by Kevin Skocypec and Sean Conway</h3>
+  <button id="start" onclick="beginProgram()" class="ghost-button-rounded-corners">Start</button>
+  </center>
+  <meta charset="utf-8"/>
+</head>
+
+<body>
+
+<center>
+<button id="after" onclick="renderSketch()" class="ghost-button-rounded-corners" style="visibility: hidden;">Save as Stencil</button> <br><br><br><br>
+<br>
+</center>
+
+<div style="position:fixed; top:150px; right:150px;">
+  <div id="tableSettings" style=" border: 1px; border-color: white; border-style:dotted; visibility:hidden; width:150px;">
+    <input type="radio" name="radio" id="yellowR" style="visibility: hidden; position:static;"/>
+    <span id="yellow" style="visibility: hidden; color:white; position:static; color:yellow;">Draw Yellow Glow</span><br>
+    <input type="radio" name="radio" id="blackR" style="visibility: hidden; position:static;" checked/>
+    <span id="black" style="visibility: hidden; color:white; position:static;">Sketch in Black</span>    
+  </div>
+</div> 
+
+<div style="position:fixed; top:200px; right:150px;">
+  <div id="tableSettings2" style=" border: 1px; border-color: white; border-style:dotted; visibility:hidden; width:150px;">
+    <input type="radio" name="radio2" id="drawR" style="visibility: hidden; position:static;" checked/>
+    <span id="draw" style="visibility: hidden; color:white; position:static;">Circle Brush</span><br>
+    <input type="radio" name="radio2" id="lineR" style="visibility: hidden; position:static;"/>
+    <span id="line" style="visibility: hidden; color:white; position:static;">Draw Line</span><br>
+    <input type="radio" name="radio2" id="squareR" style="visibility: hidden; position:static;"/>
+    <span id="square" style="visibility: hidden; color:white; position:static;">Draw Square</span><br>
+    <input type="radio" name="radio2" id="circleR" style="visibility: hidden; position:static;"/>
+    <span id="circle" style="visibility: hidden; color:white; position:static;">Draw Circle</span><br>
+    <center><span id="brushSize" style="visibility: hidden; color:white; position:static;">Line Size</span><br>
+    <input type="range" id="brushSizeR" value="5" min="1" onchange="changeBrush();" max="25"><br>
+    <span id="brushSizeS" style="color:white">5</span></center>
+  </div>
+</div>  
+
+<div class="outsideWrapper" id = "outside" style="visibility: hidden;">
+    <div class="insideWrapper" id = "inside">
+        <img id = "pumpkinC" src="img/pumpkin.png" class="coveredImage" style="width:100%; height:100%; z-index: 1 ">
+        <canvas id = "canvasC" class="coveringCanvas" style="width:700px; height:700px; z-index:3;"></canvas>
+        <canvas id = "canvasGlow" class="coveringCanvas" style="width:700px; height:700px; z-index: 2"></canvas>
+
+    </div>
+</div>
+
+<br><br><br><br>
+
+</body>
+<script>
+  var canvas = document.getElementById('canvasC');
+  var canvasG = document.getElementById('canvasGlow');
+  var image = document.getElementById('pumpkinC');
+  var brushSize = document.getElementById('brushSizeR').value;
+  var context = canvas.getContext('2d');
+  var contextG = canvasG.getContext('2d');
+  var started = false;
+  var clicked = false;
+  var clicking = false;
+  var color2 = '#000';
+  var whichContext = canvas.getContext('2d');
+  function getMousePos(canvas, evt) {
+    var rect = canvas.getBoundingClientRect();
+    return {
+        x: (evt.clientX - rect.left) / (rect.right - rect.left) * canvas.width,
+        y: (evt.clientY - rect.top) / (rect.bottom - rect.top) * canvas.height
+    };
+  }
+  
+  function changeBrush(){
+    brushSize = document.getElementById("brushSizeR").value;
+    document.getElementById("brushSizeS").innerHTML = brushSize;
+  }
+
+  function beginProgram(){
+    canvas.width = screen.height;
+    canvas.height = screen.height;
+    canvasG.width = screen.height;
+    canvasG.height = screen.height;
+    document.getElementById("start").style.display = "none";
+    document.getElementById("outside").style.visibility = "visible";
+    document.getElementById("after").style.visibility = "visible";
+    document.getElementById("yellow").style.visibility = "visible";
+    document.getElementById("black").style.visibility = "visible";
+    document.getElementById("yellowR").style.visibility = "visible";
+    document.getElementById("blackR").style.visibility = "visible";
+    document.getElementById("tableSettings").style.visibility = "visible";
+    document.getElementById("tableSettings2").style.visibility = "visible";
+    document.getElementById("draw").style.visibility = "visible";
+    document.getElementById("drawR").style.visibility = "visible";
+    document.getElementById("line").style.visibility = "visible";
+    document.getElementById("lineR").style.visibility = "visible";
+    document.getElementById("square").style.visibility = "visible";
+    document.getElementById("squareR").style.visibility = "visible";
+    document.getElementById("circle").style.visibility = "visible";
+    document.getElementById("circleR").style.visibility = "visible";
+    document.getElementById("brushSize").style.visibility = "visible";
+    document.getElementById("brushSizeR").style.visibility = "visible";
+    /*contextG.beginPath();
+    contextG.moveTo(0,0);
+    contextG.lineTo(500,500);
+    contextG.strokeStyle = '#ffff00';
+    contextG.stroke();
+    started = true;
+    clicked = true;  */
+
+  }
+  function renderSketch(){ 
+    /*Copyright (c) 2015 Gilly Barr under The MIT License (MIT)*/
+    var d=canvas.toDataURL("img/png");    
+    ReImg.fromCanvas(canvas).downloadPng("pumpkin_stencil");
+  }
+  var val1x = null;
+  var val1y = null;
+  window.addEventListener('mousedown', function(evt) {
+    val1y = null;
+    val1x = null;
+    //if(started==true && clicked == false){
+    var pos = getMousePos(canvas, evt);
+    // if(val1x != null && val1y!=null){
+    //console.log("x: " + pos.x + ", y: " + pos.y);
+    if(document.getElementById('blackR').checked==true){
+      color2 = '#000';
+      whichContext = canvas.getContext('2d');
+    }else if(document.getElementById('yellowR').checked==true){
+      color2 = '#ff0';
+      whichContext = canvasG.getContext('2d');
+    }
+    if(document.getElementById('drawR').checked==true){
+      whichContext.beginPath();
+      whichContext.arc(pos.x, pos.y, brushSize/2.5, 0, 2 * Math.PI, false);
+      whichContext.fillStyle = color2;
+      whichContext.fill();
+      whichContext.lineWidth = brushSize/2.5;
+      whichContext.strokeStyle = color2;
+      whichContext.stroke();  
+    }else if(document.getElementById('lineR').checked==true){
+      val1x = pos.x;
+      val1y = pos.y;
+      whichContext.beginPath();
+      whichContext.lineWidth=brushSize/2;
+      whichContext.moveTo(val1x-.5,val1y-.5);
+      whichContext.lineTo(val1x+.5,val1y+.5);
+      whichContext.strokeStyle = color2;
+      whichContext.stroke();
+    }else if(document.getElementById('squareR').checked==true){
+      val1x = pos.x;
+      val1y = pos.y;
+      whichContext.beginPath();
+      whichContext.lineWidth=1;
+      whichContext.strokeStyle = color2;
+      whichContext.rect(val1x, val1y, 1,1);
+      whichContext.stroke();
+    }else if(document.getElementById('circleR').checked==true){
+      val1x = pos.x;
+      val1y = pos.y;
+      whichContext.beginPath();
+      whichContext.lineWidth=1;
+      whichContext.strokeStyle = color2;
+      whichContext.rect(val1x, val1y, 1,1);
+      whichContext.stroke();
+    }
+
+    clicked = false;
+    clicking = true;
+  }, false);
+  
+  window.addEventListener('mouseup', function(evt) {
+    var pos = getMousePos(canvas, evt);
+    if(document.getElementById('blackR').checked==true){
+      color2 = '#000';
+      whichContext = canvas.getContext('2d');
+    }else if(document.getElementById('yellowR').checked==true){
+      color2 = '#ff0';
+      whichContext = canvasG.getContext('2d');
+    }
+    if(document.getElementById('lineR').checked==true){
+        whichContext.beginPath();
+        whichContext.lineWidth=brushSize;
+        whichContext.moveTo(val1x,val1y);
+        whichContext.lineTo(pos.x, pos.y);
+        whichContext.strokeStyle = color2;
+        whichContext.stroke();
+    }else if(document.getElementById('squareR').checked==true){
+      if(document.getElementById('blackR').checked==true){
+        whichContext.beginPath();
+        whichContext.lineWidth=brushSize;
+        whichContext.strokeStyle = color2;
+        whichContext.rect(val1x, val1y, pos.x-val1x, pos.y-val1y);
+        whichContext.stroke();
+      }else if(document.getElementById('yellowR').checked==true){
+        whichContext.lineWidth=brushSize;
+        whichContext.strokeStyle = color2;
+        whichContext.fillStyle = color2;
+        whichContext.fillRect(val1x, val1y, pos.x-val1x, pos.y-val1y);
+      }
+    }else if(document.getElementById('circleR').checked==true){
+      if(document.getElementById('blackR').checked==true){      
+        whichContext.beginPath();
+        var distance = Math.sqrt((pos.x-val1x)*(pos.x-val1x)+(pos.y-val1y)*(pos.y-val1y));
+        whichContext.arc((pos.x+val1x)/2, (pos.y+val1y)/2, distance/2, 0, 2 * Math.PI, false);
+        whichContext.lineWidth = brushSize;
+        whichContext.strokeStyle = color2;
+        whichContext.stroke(); 
+      }else if(document.getElementById('yellowR').checked==true){      
+        whichContext.beginPath();
+        var distance = Math.sqrt((pos.x-val1x)*(pos.x-val1x)+(pos.y-val1y)*(pos.y-val1y));
+        whichContext.arc((pos.x+val1x)/2, (pos.y+val1y)/2, distance/2, 0, 2 * Math.PI, false);
+        whichContext.fillStyle = color2;
+        whichContext.fill();
+        whichContext.lineWidth = brushSize/2;
+        whichContext.strokeStyle = color2;
+        whichContext.stroke(); 
+    }
+      }
+    clicking = false;
+  }, false);
+
+  window.addEventListener('mousemove', function(evt) {
+  if(clicking == true){
+  var pos = getMousePos(canvas, evt);
+   // if(val1x != null && val1y!=null){
+    //console.log("x: " + pos.x + ", y: " + pos.y);
+    if(document.getElementById('blackR').checked==true){
+        color2 = '#000';
+        whichContext = canvas.getContext('2d');
+    }else if(document.getElementById('yellowR').checked==true){
+        color2 = '#ff0';
+        whichContext = canvasG.getContext('2d');
+    }
+    if(document.getElementById('drawR').checked==true){
+      whichContext.beginPath();
+      whichContext.arc(pos.x, pos.y, brushSize/2.5, 0, 2 * Math.PI, false);
+      whichContext.fillStyle = color2;
+      whichContext.fill();
+      whichContext.lineWidth = brushSize/2.5;
+      whichContext.strokeStyle = color2;
+      whichContext.stroke();      
+      val1y = null;
+      val1x = null;
+    }
+      }
+  }, false);
+</script>
+</html>
